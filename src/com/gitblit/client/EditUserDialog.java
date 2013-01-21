@@ -51,6 +51,7 @@ import com.gitblit.Constants.AccessRestrictionType;
 import com.gitblit.Constants.AuthorizationControl;
 import com.gitblit.Constants.PermissionType;
 import com.gitblit.Constants.RegistrantType;
+import com.gitblit.GitBlit;
 import com.gitblit.Keys;
 import com.gitblit.models.RegistrantAccessPermission;
 import com.gitblit.models.RepositoryModel;
@@ -159,18 +160,18 @@ public class EditUserDialog extends JDialog {
 		countryCodeField = new JTextField(anUser.countryCode == null ? "" : anUser.countryCode, 15);
 		
 		// credentials are optionally controlled by 3rd-party authentication
-		usernameField.setEnabled(settings.supportsCredentialChanges);
-		passwordField.setEnabled(settings.supportsCredentialChanges);
-		confirmPasswordField.setEnabled(settings.supportsCredentialChanges);
+		usernameField.setEnabled(GitBlit.self().getPermissionManagement().supportsCredentialChanges(user.username));
+		passwordField.setEnabled(GitBlit.self().getPermissionManagement().supportsCredentialChanges(user.username));
+		confirmPasswordField.setEnabled(GitBlit.self().getPermissionManagement().supportsCredentialChanges(user.username));
 
-		displayNameField.setEnabled(settings.supportsDisplayNameChanges);
-		emailAddressField.setEnabled(settings.supportsEmailAddressChanges);
+		displayNameField.setEnabled(GitBlit.self().getPermissionManagement().supportsDisplayNameChanges(user.username));
+		emailAddressField.setEnabled(GitBlit.self().getPermissionManagement().supportsEmailAddressChanges(user.username));
 		
-		organizationalUnitField.setEnabled(settings.supportsDisplayNameChanges);
-		organizationField.setEnabled(settings.supportsDisplayNameChanges);
-		localityField.setEnabled(settings.supportsDisplayNameChanges);
-		stateProvinceField.setEnabled(settings.supportsDisplayNameChanges);
-		countryCodeField.setEnabled(settings.supportsDisplayNameChanges);
+		organizationalUnitField.setEnabled(GitBlit.self().getPermissionManagement().supportsDisplayNameChanges(user.username));
+		organizationField.setEnabled(GitBlit.self().getPermissionManagement().supportsDisplayNameChanges(user.username));
+		localityField.setEnabled(GitBlit.self().getPermissionManagement().supportsDisplayNameChanges(user.username));
+		stateProvinceField.setEnabled(GitBlit.self().getPermissionManagement().supportsDisplayNameChanges(user.username));
+		countryCodeField.setEnabled(GitBlit.self().getPermissionManagement().supportsDisplayNameChanges(user.username));
 
 		JPanel fieldsPanel = new JPanel(new GridLayout(0, 1));
 		fieldsPanel.add(newFieldPanel(Translation.get("gb.username"), usernameField));
@@ -194,7 +195,7 @@ public class EditUserDialog extends JDialog {
 		final Insets _insets = new Insets(5, 5, 5, 5);
 		repositoryPalette = new RegistrantPermissionsPanel(RegistrantType.REPOSITORY);
 		teamsPalette = new JPalette<TeamModel>();
-		teamsPalette.setEnabled(settings.supportsTeamMembershipChanges);
+		teamsPalette.setEnabled(GitBlit.self().getPermissionManagement().supportsTeamMembershipChanges(user.username));
 
 		JPanel fieldsPanelTop = new JPanel(new BorderLayout());
 		fieldsPanelTop.add(fieldsPanel, BorderLayout.NORTH);

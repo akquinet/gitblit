@@ -55,7 +55,7 @@ public class EditUserPage extends RootSubPage {
 	public EditUserPage() {
 		// create constructor
 		super();
-		if (!GitBlit.self().supportsAddUser()) {
+		if (!GitBlit.self().getPermissionManagement().supportsAddUser()) {
 			error(MessageFormat.format(getString("gb.userServiceDoesNotPermitAddUser"),
 					GitBlit.getString(Keys.realm.userService, "${baseFolder}/users.conf")), true);
 		}
@@ -70,7 +70,7 @@ public class EditUserPage extends RootSubPage {
 		super(params);
 		isCreate = false;
 		String name = WicketUtils.getUsername(params);
-		UserModel model = GitBlit.self().getUserModel(name);
+		UserModel model = GitBlit.self().getPermissionManagement().getUserModel(name);
 		setupPage(model);
 		setStatelessHint(false);
 		setOutputMarkupId(true);
@@ -102,11 +102,11 @@ public class EditUserPage extends RootSubPage {
 		Collections.sort(userTeams);
 		
 		final String oldName = userModel.username;
-		final List<RegistrantAccessPermission> permissions = GitBlit.self().getUserAccessPermissions(userModel);
+		final List<RegistrantAccessPermission> permissions = GitBlit.self().getPermissionManagement().getUserAccessPermissions(userModel);
 
 		final Palette<String> teams = new Palette<String>("teams", new ListModel<String>(
 				new ArrayList<String>(userTeams)), new CollectionModel<String>(GitBlit.self()
-				.getAllTeamnames()), new StringChoiceRenderer(), 10, false);
+				.getPermissionManagement().getAllTeamnames()), new StringChoiceRenderer(), 10, false);
 		Form<UserModel> form = new Form<UserModel>("editForm", model) {
 
 			private static final long serialVersionUID = 1L;
@@ -126,7 +126,7 @@ public class EditUserPage extends RootSubPage {
 				userModel.username = userModel.username.toLowerCase();
 				String username = userModel.username;
 				if (isCreate) {
-					UserModel model = GitBlit.self().getUserModel(username);
+					UserModel model = GitBlit.self().getPermissionManagement().getUserModel(username);
 					if (model != null) {
 						error(MessageFormat.format(getString("gb.usernameUnavailable"), username));
 						return;
@@ -134,7 +134,7 @@ public class EditUserPage extends RootSubPage {
 				}
 				boolean rename = !StringUtils.isEmpty(oldName)
 						&& !oldName.equalsIgnoreCase(username);
-				if (GitBlit.self().supportsCredentialChanges(userModel)) {
+				if (GitBlit.self().getPermissionManagement().supportsCredentialChanges(userModel.username)) {
 					if (!userModel.password.equals(confirmPassword.getObject())) {
 						error(getString("gb.passwordsDoNotMatch"));
 						return;
@@ -180,7 +180,7 @@ public class EditUserPage extends RootSubPage {
 				Iterator<String> selectedTeams = teams.getSelectedChoices();
 				userModel.teams.clear();
 				while (selectedTeams.hasNext()) {
-					TeamModel team = GitBlit.self().getTeamModel(selectedTeams.next());
+					TeamModel team = GitBlit.self().getPermissionManagement().getTeamModel(selectedTeams.next());
 					if (team == null) {
 						continue;
 					}
@@ -188,7 +188,7 @@ public class EditUserPage extends RootSubPage {
 				}
 
 				try {					
-					GitBlit.self().updateUserModel(oldName, userModel, isCreate);
+					GitBlit.self().getPermissionManagement().updateUserModel(oldName, userModel, isCreate);
 				} catch (GitBlitException e) {
 					error(e.getMessage());
 					return;
@@ -210,16 +210,16 @@ public class EditUserPage extends RootSubPage {
 		form.add(new SimpleAttributeModifier("autocomplete", "off"));
 		
 		// not all user services support manipulating username and password
-		boolean editCredentials = GitBlit.self().supportsCredentialChanges(userModel);
+		boolean editCredentials = GitBlit.self().getPermissionManagement().supportsCredentialChanges(userModel.username);
 		
 		// not all user services support manipulating display name
-		boolean editDisplayName = GitBlit.self().supportsDisplayNameChanges(userModel);
+		boolean editDisplayName = GitBlit.self().getPermissionManagement().supportsDisplayNameChanges(userModel.username);
 
 		// not all user services support manipulating email address
-		boolean editEmailAddress = GitBlit.self().supportsEmailAddressChanges(userModel);
+		boolean editEmailAddress = GitBlit.self().getPermissionManagement().supportsEmailAddressChanges(userModel.username);
 
 		// not all user services support manipulating team memberships
-		boolean editTeams = GitBlit.self().supportsTeamMembershipChanges(userModel);
+		boolean editTeams = GitBlit.self().getPermissionManagement().supportsTeamMembershipChanges(userModel.username);
 
 		// field names reflective match UserModel fields
 		form.add(new TextField<String>("username").setEnabled(editCredentials));

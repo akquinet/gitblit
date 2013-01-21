@@ -149,8 +149,8 @@ public class EditRepositoryPage extends RootSubPage {
 			}
 		} else {
 			super.setupPage(getString("gb.edit"), repositoryModel.name);
-			repositoryUsers.addAll(GitBlit.self().getUserAccessPermissions(repositoryModel));
-			repositoryTeams.addAll(GitBlit.self().getTeamAccessPermissions(repositoryModel));
+			repositoryUsers.addAll(GitBlit.self().getPermissionManagement().getUserAccessPermissions(repositoryModel));
+			repositoryTeams.addAll(GitBlit.self().getPermissionManagement().getTeamAccessPermissions(repositoryModel));
 			Collections.sort(repositoryUsers);
 			Collections.sort(repositoryTeams);
 			
@@ -163,13 +163,13 @@ public class EditRepositoryPage extends RootSubPage {
 		final String oldName = repositoryModel.name;
 
 		final RegistrantPermissionsPanel usersPalette = new RegistrantPermissionsPanel("users", 
-				RegistrantType.USER, GitBlit.self().getAllUsernames(), repositoryUsers, getAccessPermissions());
+				RegistrantType.USER, GitBlit.self().getPermissionManagement().getAllUsernames(), repositoryUsers, getAccessPermissions());
 		final RegistrantPermissionsPanel teamsPalette = new RegistrantPermissionsPanel("teams", 
-				RegistrantType.TEAM, GitBlit.self().getAllTeamnames(), repositoryTeams, getAccessPermissions());
+				RegistrantType.TEAM, GitBlit.self().getPermissionManagement().getAllTeamnames(), repositoryTeams, getAccessPermissions());
 
 		// repo administrators palette
 		List admins = multiConfigUtil.convertCollectionToList(repositoryModel.getRepoAdministrators());
-		List persons = GitBlit.self().getAllUsernames();
+		List persons = GitBlit.self().getPermissionManagement().getAllUsernames();
 		final Palette repoAdministratorsPalette = new Palette("repoAdministrators", new ListModel<String>(admins), new CollectionModel<String>(
 		      persons), new StringChoiceRenderer(), 10, true);
 		
@@ -374,8 +374,8 @@ public class EditRepositoryPage extends RootSubPage {
 
 					// repository access permissions
 					if (repositoryModel.accessRestriction.exceeds(AccessRestrictionType.NONE)) {
-						GitBlit.self().setUserAccessPermissions(repositoryModel, repositoryUsers);
-						GitBlit.self().setTeamAccessPermissions(repositoryModel, repositoryTeams);
+						GitBlit.self().getPermissionManagement().setUserAccessPermissions(repositoryModel, repositoryUsers);
+						GitBlit.self().getPermissionManagement().setTeamAccessPermissions(repositoryModel, repositoryTeams);
 					}
 				} catch (GitBlitException e) {
 					error(e.getMessage());

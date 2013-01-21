@@ -70,7 +70,7 @@ public class EditTeamPage extends RootSubPage {
 		super(params);
 		isCreate = false;
 		String name = WicketUtils.getTeamname(params);
-		TeamModel model = GitBlit.self().getTeamModel(name);
+		TeamModel model = GitBlit.self().getPermissionManagement().getTeamModel(name);
 		setupPage(model);
 		setStatelessHint(false);
 		setOutputMarkupId(true);
@@ -103,7 +103,7 @@ public class EditTeamPage extends RootSubPage {
 		// users palette
 		final Palette<String> users = new Palette<String>("users", new ListModel<String>(
 				new ArrayList<String>(teamUsers)), new CollectionModel<String>(GitBlit.self()
-				.getAllUsernames()), new StringChoiceRenderer(), 10, false);
+				.getPermissionManagement().getAllUsernames()), new StringChoiceRenderer(), 10, false);
 
 		// pre-receive palette
 		if (teamModel.preReceiveScripts != null) {
@@ -140,7 +140,7 @@ public class EditTeamPage extends RootSubPage {
 					return;
 				}
 				if (isCreate) {
-					TeamModel model = GitBlit.self().getTeamModel(teamname);
+					TeamModel model = GitBlit.self().getPermissionManagement().getTeamModel(teamname);
 					if (model != null) {
 						error(MessageFormat.format(getString("gb.teamNameUnavailable"), teamname));
 						return;
@@ -192,7 +192,7 @@ public class EditTeamPage extends RootSubPage {
 				teamModel.postReceiveScripts.addAll(postReceiveScripts);
 
 				try {
-					GitBlit.self().updateTeamModel(oldName, teamModel, isCreate);
+					GitBlit.self().getPermissionManagement().updateTeamModel(oldName, teamModel, isCreate);
 				} catch (GitBlitException e) {
 					error(e.getMessage());
 					return;
@@ -212,7 +212,7 @@ public class EditTeamPage extends RootSubPage {
 		form.add(new SimpleAttributeModifier("autocomplete", "off"));
 
 		// not all user services support manipulating team memberships
-		boolean editMemberships = GitBlit.self().supportsTeamMembershipChanges(null);
+		boolean editMemberships = GitBlit.self().getPermissionManagement().supportsTeamMembershipChanges(null);
 		
 		// field names reflective match TeamModel fields
 		form.add(new TextField<String>("name"));

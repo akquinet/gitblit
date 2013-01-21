@@ -174,7 +174,7 @@ public class RepositoriesPanel extends BasePanel {
 					if (name.charAt(0) == '~') {
 						// user page
 						String username = name.substring(1);
-						UserModel user = GitBlit.self().getUserModel(username);
+						UserModel user = GitBlit.self().getPermissionManagement().getUserModel(username);
 						row.add(new LinkPanel("groupName", null, (user == null ? username : user.getDisplayName()) + " (" + groupRow.count + ")", UserPage.class, WicketUtils.newUsernameParameter(username)));
 						row.add(new Label("groupDescription", getString("gb.personalRepositories")));
 					} else {

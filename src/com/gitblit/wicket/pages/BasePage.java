@@ -138,14 +138,14 @@ public abstract class BasePage extends WebPage {
 		if (session.isLoggedIn() && !session.isSessionInvalidated()) {
 			// already have a session, refresh usermodel to pick up
 			// any changes to permissions or roles (issue-186)
-			UserModel user = GitBlit.self().getUserModel(session.getUser().username);
+			UserModel user = GitBlit.self().getPermissionManagement().getUserModel(session.getUser().username);
 			session.setUser(user);
 			return;
 		}
 		
 		// try to authenticate by servlet request
 		HttpServletRequest httpRequest = ((WebRequest) getRequestCycle().getRequest()).getHttpServletRequest();
-		UserModel user = GitBlit.self().authenticate(httpRequest);
+		UserModel user = GitBlit.self().getPermissionManagement().authenticate(httpRequest);
 
 		// Login the user
 		if (user != null) {
@@ -155,7 +155,7 @@ public abstract class BasePage extends WebPage {
 
 			// Set Cookie
 			WebResponse response = (WebResponse) getRequestCycle().getResponse();
-			GitBlit.self().setCookie(response, user);
+			GitBlit.self().getPermissionManagement().setCookie(response, user);
 			
 			session.continueRequest();
 		}
@@ -341,7 +341,7 @@ public abstract class BasePage extends WebPage {
 			// need TeamModels first
 			List<TeamModel> teamModels = new ArrayList<TeamModel>();
 			for (String name : teams) {
-				TeamModel teamModel = GitBlit.self().getTeamModel(name);
+				TeamModel teamModel = GitBlit.self().getPermissionManagement().getTeamModel(name);
 				if (teamModel != null) {
 					teamModels.add(teamModel);
 				}
@@ -436,7 +436,7 @@ public abstract class BasePage extends WebPage {
 			GitBlitWebSession session = GitBlitWebSession.get();
 			if (session.isLoggedIn()) {				
 				UserModel user = session.getUser();
-				boolean editCredentials = GitBlit.self().supportsCredentialChanges(user);
+				boolean editCredentials = GitBlit.self().getPermissionManagement().supportsCredentialChanges(user.username);
 				boolean standardLogin = session.authenticationType.isStandard();
 
 				// username, logout, and change password

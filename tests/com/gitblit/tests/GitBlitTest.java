@@ -49,10 +49,10 @@ public class GitBlitTest {
 
 	@Test
 	public void testUserModel() throws Exception {
-		List<String> users = GitBlit.self().getAllUsernames();
+		List<String> users = GitBlit.self().getPermissionManagement().getAllUsernames();
 		assertTrue("No users found!", users.size() > 0);
 		assertTrue("Admin not found", users.contains("admin"));
-		UserModel user = GitBlit.self().getUserModel("admin");
+		UserModel user = GitBlit.self().getPermissionManagement().getUserModel("admin");
 		assertEquals("admin", user.toString());
 		assertTrue("Admin missing #admin role!", user.canAdmin);
 		user.canAdmin = false;
@@ -176,7 +176,7 @@ public class GitBlitTest {
 
 	@Test
 	public void testAuthentication() throws Exception {
-		assertTrue(GitBlit.self().authenticate("admin", "admin".toCharArray()) != null);
+		assertTrue(GitBlit.self().getPermissionManagement().authenticate("admin", "admin".toCharArray()) != null);
 	}
 
 	@Test

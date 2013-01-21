@@ -27,8 +27,8 @@ public class LogoutPage extends WebPage {
 	public LogoutPage() {
 		GitBlitWebSession session = GitBlitWebSession.get();
 		UserModel user = session.getUser();
-		GitBlit.self().setCookie((WebResponse) getResponse(), null);
-		GitBlit.self().logout(user);
+		GitBlit.self().getPermissionManagement().setCookie((WebResponse) getResponse(), null);
+		GitBlit.self().getPermissionManagement().logout(user);
 		session.invalidate();		
 		setRedirect(true);
 		setResponsePage(getApplication().getHomePage());

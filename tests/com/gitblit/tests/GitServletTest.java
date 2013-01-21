@@ -148,7 +148,7 @@ public class GitServletTest {
 		model.authorizationControl = AuthorizationControl.NAMED;
 		UserModel user = new UserModel("james");
 		user.password = "james";
-		GitBlit.self().updateUserModel(user.username, user, true);
+		GitBlit.self().getPermissionManagement().updateUserModel(user.username, user, true);
 		GitBlit.self().updateRepositoryModel(model.name, model, false);
 
 		FileUtils.delete(ticgit2Folder, FileUtils.RECURSIVE);
@@ -195,7 +195,7 @@ public class GitServletTest {
 		model.accessRestriction = AccessRestrictionType.NONE;
 		model.authorizationControl = AuthorizationControl.NAMED;
 		GitBlit.self().updateRepositoryModel(model.name, model, false);
-		GitBlit.self().deleteUser(user.username);
+		GitBlit.self().getPermissionManagement().deleteUser(user.username);
 	}
 
 	@Test
@@ -357,8 +357,8 @@ public class GitServletTest {
 	
 	private void testCommitterVerification(UserModel user, String displayName, String emailAddress, boolean expectedSuccess) throws Exception {
 		
-		if (GitBlit.self().getUserModel(user.username) != null) {
-			GitBlit.self().deleteUser(user.username);
+		if (GitBlit.self().getPermissionManagement().getUserModel(user.username) != null) {
+			GitBlit.self().getPermissionManagement().deleteUser(user.username);
 		}
 		
 		CredentialsProvider cp = new UsernamePasswordCredentialsProvider(user.username, user.password);
@@ -385,7 +385,7 @@ public class GitServletTest {
 		// grant user push permission
 		user.setRepositoryPermission(model.name, AccessPermission.PUSH);
 		
-		GitBlit.self().updateUserModel(user.username, user, true);
+		GitBlit.self().getPermissionManagement().updateUserModel(user.username, user, true);
 		GitBlit.self().updateRepositoryModel(model.name, model, false);
 
 		// clone temp bare repo to working copy
@@ -468,8 +468,8 @@ public class GitServletTest {
 		UserModel user = new UserModel("james");
 		user.password = "james";
 		
-		if (GitBlit.self().getUserModel(user.username) != null) {
-			GitBlit.self().deleteUser(user.username);
+		if (GitBlit.self().getPermissionManagement().getUserModel(user.username) != null) {
+			GitBlit.self().getPermissionManagement().deleteUser(user.username);
 		}
 		
 		CredentialsProvider cp = new UsernamePasswordCredentialsProvider(user.username, user.password);
@@ -504,7 +504,7 @@ public class GitServletTest {
 		// grant user specified
 		user.setRepositoryPermission(model.name, permission);
 
-		GitBlit.self().updateUserModel(user.username, user, true);
+		GitBlit.self().getPermissionManagement().updateUserModel(user.username, user, true);
 		GitBlit.self().updateRepositoryModel(model.name, model, false);
 
 		// clone temp bare repo to working copy
@@ -654,7 +654,7 @@ public class GitServletTest {
 		// close serving repository
 		GitBlitSuite.close(refChecks);
 
-		GitBlit.self().deleteUser(user.username);
+		GitBlit.self().getPermissionManagement().deleteUser(user.username);
 	}
 	
 	@Test
@@ -669,14 +669,14 @@ public class GitServletTest {
 		UserModel user = new UserModel("sampleuser");
 		user.password = user.username;
 		
-		if (GitBlit.self().getUserModel(user.username) != null) {
-			GitBlit.self().deleteUser(user.username);
+		if (GitBlit.self().getPermissionManagement().getUserModel(user.username) != null) {
+			GitBlit.self().getPermissionManagement().deleteUser(user.username);
 		}
 		
 		user.canCreate = canCreate;
 		user.canAdmin = canAdmin;
 		
-		GitBlit.self().updateUserModel(user.username, user, true);
+		GitBlit.self().getPermissionManagement().updateUserModel(user.username, user, true);
 
 		CredentialsProvider cp = new UsernamePasswordCredentialsProvider(user.username, user.password);
 		
@@ -762,7 +762,7 @@ public class GitServletTest {
 		}
 
 		GitBlitSuite.close(git);
-		GitBlit.self().deleteUser(user.username);
+		GitBlit.self().getPermissionManagement().deleteUser(user.username);
 	}
 	
 	@Test

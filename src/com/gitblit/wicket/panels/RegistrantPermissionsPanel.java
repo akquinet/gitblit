@@ -139,7 +139,7 @@ public class RegistrantPermissionsPanel extends BasePanel {
 				} else if (RegistrantType.USER.equals(entry.registrantType)) {
 					// user
 					PersonIdent ident = new PersonIdent(entry.registrant, "");
-					UserModel user = GitBlit.self().getUserModel(entry.registrant);
+					UserModel user = GitBlit.self().getPermissionManagement().getUserModel(entry.registrant);
 					if (user != null) {
 						ident = new PersonIdent(user.getDisplayName(), user.emailAddress == null ? user.getDisplayName() : user.emailAddress);
 					}

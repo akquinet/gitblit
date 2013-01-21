@@ -78,7 +78,7 @@ public class UserPage extends RootPage {
 			throw new GitblitRedirectException(GitBlitWebApp.get().getHomePage());
 		}
 
-		UserModel user = GitBlit.self().getUserModel(userName);
+		UserModel user = GitBlit.self().getPermissionManagement().getUserModel(userName);
 		if (user == null) {
 			// construct a temporary user model
 			user = new UserModel(userName);

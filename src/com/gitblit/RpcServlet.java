@@ -65,8 +65,8 @@ public class RpcServlet extends JsonServlet {
 	 * @throws java.io.IOException
 	 */
 	@Override
-	protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void processRequest(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 		RpcRequest reqType = RpcRequest.fromName(request.getParameter("req"));
 		String objectName = request.getParameter("name");
 		logger.info(MessageFormat.format("Rpc {0} request from {1}", reqType,
@@ -94,7 +94,8 @@ public class RpcServlet extends JsonServlet {
 			String cloneUrl = sb.toString();
 
 			// list repositories
-			List<RepositoryModel> list = GitBlit.self().getRepositoryModels(user);
+			List<RepositoryModel> list = GitBlit.self().getRepositoryModels(
+					user);
 			Map<String, RepositoryModel> repositories = new HashMap<String, RepositoryModel>();
 			for (RepositoryModel model : list) {
 				String url = MessageFormat.format(cloneUrl, model.name);
@@ -104,7 +105,8 @@ public class RpcServlet extends JsonServlet {
 		} else if (RpcRequest.LIST_BRANCHES.equals(reqType)) {
 			// list all local branches in all repositories accessible to user
 			Map<String, List<String>> localBranches = new HashMap<String, List<String>>();
-			List<RepositoryModel> models = GitBlit.self().getRepositoryModels(user);
+			List<RepositoryModel> models = GitBlit.self().getRepositoryModels(
+					user);
 			for (RepositoryModel model : models) {
 				if (!model.hasCommits) {
 					// skip empty repository
@@ -112,15 +114,20 @@ public class RpcServlet extends JsonServlet {
 				}
 				if (model.isCollectingGarbage) {
 					// skip garbage collecting repository
-					logger.warn(MessageFormat.format("Temporarily excluding {0} from RPC, busy collecting garbage", model.name));
+					logger.warn(MessageFormat
+							.format("Temporarily excluding {0} from RPC, busy collecting garbage",
+									model.name));
 					continue;
 				}
 				// get local branches
-				Repository repository = GitBlit.self().getRepository(model.name);
-				List<RefModel> refs = JGitUtils.getLocalBranches(repository, false, -1);
+				Repository repository = GitBlit.self()
+						.getRepository(model.name);
+				List<RefModel> refs = JGitUtils.getLocalBranches(repository,
+						false, -1);
 				if (model.showRemoteBranches) {
 					// add remote branches if repository displays them
-					refs.addAll(JGitUtils.getRemoteBranches(repository, false, -1));
+					refs.addAll(JGitUtils.getRemoteBranches(repository, false,
+							-1));
 				}
 				if (refs.size() > 0) {
 					List<String> branches = new ArrayList<String>();
@@ -134,23 +141,28 @@ public class RpcServlet extends JsonServlet {
 			result = localBranches;
 		} else if (RpcRequest.LIST_USERS.equals(reqType)) {
 			// list users
-			List<String> names = GitBlit.self().getAllUsernames();
+			List<String> names = GitBlit.self().getPermissionManagement()
+					.getAllUsernames();
 			List<UserModel> users = new ArrayList<UserModel>();
 			for (String name : names) {
-				users.add(GitBlit.self().getUserModel(name));
+				users.add(GitBlit.self().getPermissionManagement()
+						.getUserModel(name));
 			}
 			result = users;
 		} else if (RpcRequest.LIST_TEAMS.equals(reqType)) {
 			// list teams
-			List<String> names = GitBlit.self().getAllTeamnames();
+			List<String> names = GitBlit.self().getPermissionManagement()
+					.getAllTeamnames();
 			List<TeamModel> teams = new ArrayList<TeamModel>();
 			for (String name : names) {
-				teams.add(GitBlit.self().getTeamModel(name));
+				teams.add(GitBlit.self().getPermissionManagement()
+						.getTeamModel(name));
 			}
 			result = teams;
 		} else if (RpcRequest.CREATE_REPOSITORY.equals(reqType)) {
 			// create repository
-			RepositoryModel model = deserialize(request, response, RepositoryModel.class);
+			RepositoryModel model = deserialize(request, response,
+					RepositoryModel.class);
 			try {
 				GitBlit.self().updateRepositoryModel(model.name, model, true);
 			} catch (GitBlitException e) {
@@ -158,7 +170,8 @@ public class RpcServlet extends JsonServlet {
 			}
 		} else if (RpcRequest.EDIT_REPOSITORY.equals(reqType)) {
 			// edit repository
-			RepositoryModel model = deserialize(request, response, RepositoryModel.class);
+			RepositoryModel model = deserialize(request, response,
+					RepositoryModel.class);
 			// name specifies original repository name in event of rename
 			String repoName = objectName;
 			if (repoName == null) {
@@ -171,13 +184,15 @@ public class RpcServlet extends JsonServlet {
 			}
 		} else if (RpcRequest.DELETE_REPOSITORY.equals(reqType)) {
 			// delete repository
-			RepositoryModel model = deserialize(request, response, RepositoryModel.class);
+			RepositoryModel model = deserialize(request, response,
+					RepositoryModel.class);
 			GitBlit.self().deleteRepositoryModel(model);
 		} else if (RpcRequest.CREATE_USER.equals(reqType)) {
 			// create user
 			UserModel model = deserialize(request, response, UserModel.class);
 			try {
-				GitBlit.self().updateUserModel(model.username, model, true);
+				GitBlit.self().getPermissionManagement()
+						.updateUserModel(model.username, model, true);
 			} catch (GitBlitException e) {
 				response.setStatus(failureCode);
 			}
@@ -190,21 +205,24 @@ public class RpcServlet extends JsonServlet {
 				username = model.username;
 			}
 			try {
-				GitBlit.self().updateUserModel(username, model, false);
+				GitBlit.self().getPermissionManagement()
+						.updateUserModel(username, model, false);
 			} catch (GitBlitException e) {
 				response.setStatus(failureCode);
 			}
 		} else if (RpcRequest.DELETE_USER.equals(reqType)) {
 			// delete user
 			UserModel model = deserialize(request, response, UserModel.class);
-			if (!GitBlit.self().deleteUser(model.username)) {
+			if (!GitBlit.self().getPermissionManagement()
+					.deleteUser(model.username)) {
 				response.setStatus(failureCode);
 			}
 		} else if (RpcRequest.CREATE_TEAM.equals(reqType)) {
 			// create team
 			TeamModel model = deserialize(request, response, TeamModel.class);
 			try {
-				GitBlit.self().updateTeamModel(model.name, model, true);
+				GitBlit.self().getPermissionManagement()
+						.updateTeamModel(model.name, model, true);
 			} catch (GitBlitException e) {
 				response.setStatus(failureCode);
 			}
@@ -217,48 +235,65 @@ public class RpcServlet extends JsonServlet {
 				teamname = model.name;
 			}
 			try {
-				GitBlit.self().updateTeamModel(teamname, model, false);
+				GitBlit.self().getPermissionManagement()
+						.updateTeamModel(teamname, model, false);
 			} catch (GitBlitException e) {
 				response.setStatus(failureCode);
 			}
 		} else if (RpcRequest.DELETE_TEAM.equals(reqType)) {
 			// delete team
 			TeamModel model = deserialize(request, response, TeamModel.class);
-			if (!GitBlit.self().deleteTeam(model.name)) {
+			if (!GitBlit.self().getPermissionManagement()
+					.deleteTeam(model.name)) {
 				response.setStatus(failureCode);
 			}
 		} else if (RpcRequest.LIST_REPOSITORY_MEMBERS.equals(reqType)) {
 			// get repository members
-			RepositoryModel model = GitBlit.self().getRepositoryModel(objectName);
-			result = GitBlit.self().getRepositoryUsers(model);
+			RepositoryModel model = GitBlit.self().getRepositoryModel(
+					objectName);
+			result = GitBlit.self().getPermissionManagement()
+					.getRepositoryUsers(model);
 		} else if (RpcRequest.SET_REPOSITORY_MEMBERS.equals(reqType)) {
 			// rejected since 1.2.0
 			response.setStatus(failureCode);
-		} else if (RpcRequest.LIST_REPOSITORY_MEMBER_PERMISSIONS.equals(reqType)) {
+		} else if (RpcRequest.LIST_REPOSITORY_MEMBER_PERMISSIONS
+				.equals(reqType)) {
 			// get repository member permissions
-			RepositoryModel model = GitBlit.self().getRepositoryModel(objectName);
-			result = GitBlit.self().getUserAccessPermissions(model);
+			RepositoryModel model = GitBlit.self().getRepositoryModel(
+					objectName);
+			result = GitBlit.self().getPermissionManagement()
+					.getUserAccessPermissions(model);
 		} else if (RpcRequest.SET_REPOSITORY_MEMBER_PERMISSIONS.equals(reqType)) {
 			// set the repository permissions for the specified users
-			RepositoryModel model = GitBlit.self().getRepositoryModel(objectName);
-			Collection<RegistrantAccessPermission> permissions = deserialize(request, response, RpcUtils.REGISTRANT_PERMISSIONS_TYPE);
-			result = GitBlit.self().setUserAccessPermissions(model, permissions);
+			RepositoryModel model = GitBlit.self().getRepositoryModel(
+					objectName);
+			Collection<RegistrantAccessPermission> permissions = deserialize(
+					request, response, RpcUtils.REGISTRANT_PERMISSIONS_TYPE);
+			result = GitBlit.self().getPermissionManagement()
+					.setUserAccessPermissions(model, permissions);
 		} else if (RpcRequest.LIST_REPOSITORY_TEAMS.equals(reqType)) {
 			// get repository teams
-			RepositoryModel model = GitBlit.self().getRepositoryModel(objectName);
-			result = GitBlit.self().getRepositoryTeams(model);
+			RepositoryModel model = GitBlit.self().getRepositoryModel(
+					objectName);
+			result = GitBlit.self().getPermissionManagement()
+					.getRepositoryTeams(model);
 		} else if (RpcRequest.SET_REPOSITORY_TEAMS.equals(reqType)) {
 			// rejected since 1.2.0
 			response.setStatus(failureCode);
 		} else if (RpcRequest.LIST_REPOSITORY_TEAM_PERMISSIONS.equals(reqType)) {
 			// get repository team permissions
-			RepositoryModel model = GitBlit.self().getRepositoryModel(objectName);
-			result = GitBlit.self().getTeamAccessPermissions(model);
+			RepositoryModel model = GitBlit.self().getRepositoryModel(
+					objectName);
+			result = GitBlit.self().getPermissionManagement()
+					.getTeamAccessPermissions(model);
 		} else if (RpcRequest.SET_REPOSITORY_TEAM_PERMISSIONS.equals(reqType)) {
 			// set the repository permissions for the specified teams
-			RepositoryModel model = GitBlit.self().getRepositoryModel(objectName);
-			Collection<RegistrantAccessPermission> permissions = deserialize(request, response, RpcUtils.REGISTRANT_PERMISSIONS_TYPE);
-			result = GitBlit.self().setTeamAccessPermissions(model, permissions);
+			RepositoryModel model = GitBlit.self().getRepositoryModel(
+					objectName);
+			Collection<RegistrantAccessPermission> permissions = deserialize(
+					request, response, RpcUtils.REGISTRANT_PERMISSIONS_TYPE);
+			result = GitBlit.self().getPermissionManagement()
+					.setTeamAccessPermissions(model, permissions);
 		} else if (RpcRequest.LIST_FEDERATION_REGISTRATIONS.equals(reqType)) {
 			// return the list of federation registrations
 			if (allowAdmin) {

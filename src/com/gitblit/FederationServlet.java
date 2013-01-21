@@ -194,10 +194,10 @@ public class FederationServlet extends JsonServlet {
 					response.sendError(HttpServletResponse.SC_FORBIDDEN);
 					return;
 				}
-				List<String> usernames = GitBlit.self().getAllUsernames();
+				List<String> usernames = GitBlit.self().getPermissionManagement().getAllUsernames();
 				List<UserModel> users = new ArrayList<UserModel>();
 				for (String username : usernames) {
-					UserModel user = GitBlit.self().getUserModel(username);
+					UserModel user = GitBlit.self().getPermissionManagement().getUserModel(username);
 					if (!user.excludeFromFederation) {
 						users.add(user);
 					}
@@ -213,10 +213,10 @@ public class FederationServlet extends JsonServlet {
 					response.sendError(HttpServletResponse.SC_FORBIDDEN);
 					return;
 				}
-				List<String> teamnames = GitBlit.self().getAllTeamnames();
+				List<String> teamnames = GitBlit.self().getPermissionManagement().getAllTeamnames();
 				List<TeamModel> teams = new ArrayList<TeamModel>();
 				for (String teamname : teamnames) {
-					TeamModel user = GitBlit.self().getTeamModel(teamname);
+					TeamModel user = GitBlit.self().getPermissionManagement().getTeamModel(teamname);
 					teams.add(user);
 				}
 				result = teams;
@@ -235,7 +235,7 @@ public class FederationServlet extends JsonServlet {
 				Set<String> names = new HashSet<String>();
 				names.addAll(GitBlit.getStrings(Keys.groovy.preReceiveScripts));
 				names.addAll(GitBlit.getStrings(Keys.groovy.postReceiveScripts));
-				for (TeamModel team :  GitBlit.self().getAllTeams()) {
+				for (TeamModel team :  GitBlit.self().getPermissionManagement().getAllTeams()) {
 					names.addAll(team.preReceiveScripts);
 					names.addAll(team.postReceiveScripts);
 				}

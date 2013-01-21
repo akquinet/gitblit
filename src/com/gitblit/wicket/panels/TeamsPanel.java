@@ -40,9 +40,9 @@ public class TeamsPanel extends BasePanel {
 
 		Fragment adminLinks = new Fragment("adminPanel", "adminLinks", this);
 		adminLinks.add(new BookmarkablePageLink<Void>("newTeam", EditTeamPage.class));
-		add(adminLinks.setVisible(showAdmin && GitBlit.self().supportsTeamMembershipChanges(null)));
+		add(adminLinks.setVisible(showAdmin && GitBlit.self().getPermissionManagement().supportsTeamMembershipChanges(null)));
 
-		final List<TeamModel> teams = GitBlit.self().getAllTeams();
+		final List<TeamModel> teams = GitBlit.self().getPermissionManagement().getAllTeams();
 		DataView<TeamModel> teamsView = new DataView<TeamModel>("teamRow",
 				new ListDataProvider<TeamModel>(teams)) {
 			private static final long serialVersionUID = 1L;
@@ -73,7 +73,7 @@ public class TeamsPanel extends BasePanel {
 
 					@Override
 					public void onClick() {
-						if (GitBlit.self().deleteTeam(entry.name)) {
+						if (GitBlit.self().getPermissionManagement().deleteTeam(entry.name)) {
 							teams.remove(entry);
 							info(MessageFormat.format("Team ''{0}'' deleted.", entry.name));
 						} else {

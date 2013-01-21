@@ -115,7 +115,7 @@ public class GitServlet extends org.eclipse.jgit.http.server.GitServlet {
 
 				// determine pushing user
 				PersonIdent person = rp.getRefLogIdent();
-				UserModel user = GitBlit.self().getUserModel(person.getName());
+				UserModel user = GitBlit.self().getPermissionManagement().getUserModel(person.getName());
 				if (user == null) {
 					// anonymous push, create a temporary usermodel
 					user = new UserModel(person.getName());
@@ -145,7 +145,7 @@ public class GitServlet extends org.eclipse.jgit.http.server.GitServlet {
 					@Override
 					public Map<String, Ref> filter(Map<String, Ref> refs) {
 						// admin accounts can access all refs 
-						UserModel user = GitBlit.self().authenticate(req);
+						UserModel user = GitBlit.self().getPermissionManagement().authenticate(req);
 						if (user == null) {
 							user = UserModel.ANONYMOUS;
 						}
@@ -340,7 +340,7 @@ public class GitServlet extends org.eclipse.jgit.http.server.GitServlet {
 		 */
 		protected UserModel getUserModel(ReceivePack rp) {
 			PersonIdent person = rp.getRefLogIdent();
-			UserModel user = GitBlit.self().getUserModel(person.getName());
+			UserModel user = GitBlit.self().getPermissionManagement().getUserModel(person.getName());
 			if (user == null) {
 				// anonymous push, create a temporary usermodel
 				user = new UserModel(person.getName());

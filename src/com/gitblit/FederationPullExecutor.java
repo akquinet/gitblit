@@ -359,10 +359,10 @@ public class FederationPullExecutor implements Runnable {
 						}
 
 						// insert new user or update local user
-						UserModel localUser = GitBlit.self().getUserModel(user.username);
+						UserModel localUser = GitBlit.self().getPermissionManagement().getUserModel(user.username);
 						if (localUser == null) {
 							// create new local user
-							GitBlit.self().updateUserModel(user.username, user, true);
+							GitBlit.self().getPermissionManagement().updateUserModel(user.username, user, true);
 						} else {
 							// update repository permissions of local user
 							if (user.permissions != null) {
@@ -379,19 +379,19 @@ public class FederationPullExecutor implements Runnable {
 							}
 							localUser.password = user.password;
 							localUser.canAdmin = user.canAdmin;
-							GitBlit.self().updateUserModel(localUser.username, localUser, false);
+							GitBlit.self().getPermissionManagement().updateUserModel(localUser.username, localUser, false);
 						}
 
-						for (String teamname : GitBlit.self().getAllTeamnames()) {
-							TeamModel team = GitBlit.self().getTeamModel(teamname);
+						for (String teamname : GitBlit.self().getPermissionManagement().getAllTeamnames()) {
+							TeamModel team = GitBlit.self().getPermissionManagement().getTeamModel(teamname);
 							if (user.isTeamMember(teamname) && !team.hasUser(user.username)) {
 								// new team member
 								team.addUser(user.username);
-								GitBlit.self().updateTeamModel(teamname, team, false);
+								GitBlit.self().getPermissionManagement().updateTeamModel(teamname, team, false);
 							} else if (!user.isTeamMember(teamname) && team.hasUser(user.username)) {
 								// remove team member
 								team.removeUser(user.username);
-								GitBlit.self().updateTeamModel(teamname, team, false);
+								GitBlit.self().getPermissionManagement().updateTeamModel(teamname, team, false);
 							}
 
 							// update team repositories
@@ -402,11 +402,11 @@ public class FederationPullExecutor implements Runnable {
 									for (Map.Entry<String, AccessPermission> entry : remoteTeam.permissions.entrySet()){
 										team.setRepositoryPermission(entry.getKey(), entry.getValue());
 									}
-									GitBlit.self().updateTeamModel(teamname, team, false);
+									GitBlit.self().getPermissionManagement().updateTeamModel(teamname, team, false);
 								} else if(!ArrayUtils.isEmpty(remoteTeam.repositories)) {
 									// pulling from <= 1.1
 									team.addRepositoryPermissions(remoteTeam.repositories);
-									GitBlit.self().updateTeamModel(teamname, team, false);
+									GitBlit.self().getPermissionManagement().updateTeamModel(teamname, team, false);
 								}
 							}
 						}

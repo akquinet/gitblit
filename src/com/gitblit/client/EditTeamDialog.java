@@ -44,6 +44,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import com.gitblit.GitBlit;
 import com.gitblit.Constants.AccessRestrictionType;
 import com.gitblit.Constants.AuthorizationControl;
 import com.gitblit.Constants.RegistrantType;
@@ -143,7 +144,7 @@ public class EditTeamDialog extends JDialog {
 		final Insets _insets = new Insets(5, 5, 5, 5);
 		repositoryPalette = new RegistrantPermissionsPanel(RegistrantType.REPOSITORY);
 		userPalette = new JPalette<String>();
-		userPalette.setEnabled(settings.supportsTeamMembershipChanges);
+		userPalette.setEnabled(GitBlit.self().getPermissionManagement().supportsTeamMembershipChanges(aTeam.name));
 		
 		JPanel fieldsPanelTop = new JPanel(new BorderLayout());
 		fieldsPanelTop.add(fieldsPanel, BorderLayout.NORTH);

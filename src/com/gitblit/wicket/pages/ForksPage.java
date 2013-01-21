@@ -57,7 +57,7 @@ public class ForksPage extends RepositoryPage {
 				RepositoryModel repository = fork.repository;
 				
 				if (repository.isPersonalRepository()) {
-					UserModel user = GitBlit.self().getUserModel(repository.projectPath.substring(1));
+					UserModel user = GitBlit.self().getPermissionManagement().getUserModel(repository.projectPath.substring(1));
 					PersonIdent ident = new PersonIdent(user.getDisplayName(), user.emailAddress == null ? user.getDisplayName() : user.emailAddress);
 					item.add(new GravatarImage("anAvatar", ident, 20));
 					if (pageRepository.equals(repository)) {

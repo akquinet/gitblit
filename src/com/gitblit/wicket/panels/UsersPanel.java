@@ -41,10 +41,10 @@ public class UsersPanel extends BasePanel {
 
 		Fragment adminLinks = new Fragment("adminPanel", "adminLinks", this);
 		adminLinks.add(new BookmarkablePageLink<Void>("newUser", EditUserPage.class)
-				.setVisible(GitBlit.self().supportsAddUser()));
+				.setVisible(GitBlit.self().getPermissionManagement().supportsAddUser()));
 		add(adminLinks.setVisible(showAdmin));
 
-		final List<UserModel> users = GitBlit.self().getAllUsers();
+		final List<UserModel> users = GitBlit.self().getPermissionManagement().getAllUsers();
 		DataView<UserModel> usersView = new DataView<UserModel>("userRow",
 				new ListDataProvider<UserModel>(users)) {
 			private static final long serialVersionUID = 1L;
@@ -94,7 +94,7 @@ public class UsersPanel extends BasePanel {
 
 					@Override
 					public void onClick() {
-						if (GitBlit.self().deleteUser(entry.username)) {
+						if (GitBlit.self().getPermissionManagement().deleteUser(entry.username)) {
 							users.remove(entry);
 							info(MessageFormat.format(getString("gb.userDeleted"), entry.username));
 						} else {

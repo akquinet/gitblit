@@ -98,7 +98,7 @@ public abstract class AuthenticationFilter implements Filter {
 	 * @return user
 	 */
 	protected UserModel getUser(HttpServletRequest httpRequest) {
-		UserModel user = GitBlit.self().authenticate(httpRequest, requiresClientCertificate());
+		UserModel user = GitBlit.self().getPermissionManagement().authenticate(httpRequest, requiresClientCertificate());
 		return user;
 	}
 

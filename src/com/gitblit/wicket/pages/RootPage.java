@@ -129,7 +129,7 @@ public abstract class RootPage extends BasePage {
 				String username = RootPage.this.username.getObject();
 				char[] password = RootPage.this.password.getObject().toCharArray();
 
-				UserModel user = GitBlit.self().authenticate(username, password);
+				UserModel user = GitBlit.self().getPermissionManagement().authenticate(username, password);
 				if (user == null) {
 					error(getString("gb.invalidUsernameOrPassword"));
 				} else if (user.username.equals(Constants.FEDERATION_USER)) {
@@ -213,7 +213,7 @@ public abstract class RootPage extends BasePage {
 			// Set Cookie
 			if (GitBlit.getBoolean(Keys.web.allowCookieAuthentication, false)) {
 				WebResponse response = (WebResponse) getRequestCycle().getResponse();
-				GitBlit.self().setCookie(response, user);
+				GitBlit.self().getPermissionManagement().setCookie(response, user);
 			}
 
 			if (!session.continueRequest()) {
@@ -409,7 +409,7 @@ public abstract class RootPage extends BasePage {
 			// need TeamModels first
 			List<TeamModel> teamModels = new ArrayList<TeamModel>();
 			for (String name : teams) {
-				TeamModel teamModel = GitBlit.self().getTeamModel(name);
+				TeamModel teamModel = GitBlit.self().getPermissionManagement().getTeamModel(name);
 				if (teamModel != null) {
 					teamModels.add(teamModel);
 				}
